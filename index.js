@@ -23,12 +23,20 @@ async function run() {
     console.log("Database Connection is Ok");
     const database = client.db("foodieDB");
     const servicesCollection = database.collection("services");
+    const orderCollection = database.collection("orders");
 
     // GET API (get/load all services)
     app.get("/services", async (req, res) => {
       const cursor = servicesCollection.find({});
       const services = await cursor.toArray();
       res.send(services);
+    });
+
+    // GET API (get/load all orders)
+    app.get("/orders", async (req, res) => {
+      const cursorNew = orderCollection.find({});
+      const orders = await cursorNew.toArray();
+      res.send(orders);
     });
 
     // GET Single Service Details
@@ -43,6 +51,13 @@ async function run() {
     app.post("/services", async (req, res) => {
       const service = req.body;
       const result = await servicesCollection.insertOne(service);
+      res.json(result);
+    });
+
+    // Add Orders API (POST)
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
       res.json(result);
     });
   } finally {
