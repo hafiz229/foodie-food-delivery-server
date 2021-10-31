@@ -1,5 +1,7 @@
 const express = require("express");
 const { MongoClient } = require("mongodb");
+const ObjectId = require("mongodb").ObjectId;
+
 require("dotenv").config();
 const cors = require("cors");
 const app = express();
@@ -21,6 +23,22 @@ async function run() {
     console.log("connected to database");
     const database = client.db("foodieDB");
     const servicesCollection = database.collection("services");
+
+    // GET API (get/load all services)
+    app.get("/services", async (req, res) => {
+      const cursor = servicesCollection.find({});
+      const services = await cursor.toArray();
+      res.send(services);
+    });
+
+    // GET Single Service Details
+    app.get("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log("getting specific service", id);
+      const query = { _id: ObjectId(id) };
+      const service = await servicesCollection.findOne(query);
+      res.json(service);
+    });
   } finally {
     // await client.close();
   }
