@@ -20,7 +20,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    console.log("connected to database");
+    console.log("Database Connection is Ok");
     const database = client.db("foodieDB");
     const servicesCollection = database.collection("services");
 
@@ -34,10 +34,16 @@ async function run() {
     // GET Single Service Details
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
-      console.log("getting specific service", id);
       const query = { _id: ObjectId(id) };
       const service = await servicesCollection.findOne(query);
       res.json(service);
+    });
+
+    // POST API (Add a Service to the Database)
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await servicesCollection.insertOne(service);
+      res.json(result);
     });
   } finally {
     // await client.close();
