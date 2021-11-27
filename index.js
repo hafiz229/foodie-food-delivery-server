@@ -48,7 +48,7 @@ async function run() {
       console.log(req);
       console.log(req.complete);
       let cursor;
-      if (req.complete === false) {
+      if (email !== undefined) {
         cursor = orderCollection.find(query);
       } else {
         cursor = orderCollection.find({});
