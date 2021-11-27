@@ -33,10 +33,48 @@ async function run() {
     });
 
     // GET API (get/load all orders)
+    // app.get("/orders", async (req, res) => {
+    //   const cursorNew = orderCollection.find({});
+    //   const orders = await cursorNew.toArray();
+    //   res.send(orders);
+    // });
+
+    // GET API (get/load all orders)
     app.get("/orders", async (req, res) => {
-      const cursorNew = orderCollection.find({});
-      const orders = await cursorNew.toArray();
-      res.send(orders);
+      const email = req.query.email;
+      const query = { email: email };
+      console.log("email is :", email);
+      console.log("query is :", query);
+      console.log(req);
+      console.log(req.complete);
+      let cursor;
+      if (req.complete === false) {
+        cursor = orderCollection.find(query);
+      } else {
+        cursor = orderCollection.find({});
+      }
+      const orders = await cursor.toArray();
+      res.json(orders);
+    });
+
+    // delete a order from the order collection (My Orders)
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      console.log(result);
+      res.json(result);
+    });
+
+    // update an order status if it's not approved yet (Manage Orders)
+    app.put("/orders/:id", async (req, res) => {
+      const order = req.body;
+      // console.log(req.body);
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = { $set: order };
+      const result = await orderCollection.updateOne(filter, updateDoc);
+      res.json(result);
     });
 
     // GET Single Service Details
